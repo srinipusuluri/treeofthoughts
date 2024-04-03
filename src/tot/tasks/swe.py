@@ -1,27 +1,20 @@
-import os
 import re
-from tot.tasks.base import Task, DATA_PATH
+from tot.tasks.base import Task
 from tot.prompts.text import *
 from tot.models import gpt
 
-
-
-
 class SWETask(Task):
     """
-    Input (x)   : a text instruction
+    Input (x)   : a task instruction
     Output (y)  : a text generation
     Reward (r)  : # TODO
-    Input Example: 
-    Output Example: 
     """
-    def __init__(self, file='data_100_random_text.txt'):
+    def __init__(self, dataset):
         """
         file: a text file, each line is some sentences
         """
         super().__init__()
-        path = os.path.join(DATA_PATH, 'text', file)
-        self.data = open(path).readlines()
+        self.data = dataset
         self.steps = 2
         self.stops = ['\nPassage:\n', None]
 
