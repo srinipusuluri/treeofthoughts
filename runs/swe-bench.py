@@ -3,6 +3,7 @@ from tot.methods.bfs import solve
 from tot.tasks.swe import SWETask
 from datasets import load_dataset
 
+
 train_dataset = load_dataset("princeton-nlp/SWE-bench_Lite", split = "test")
 
 args = argparse.Namespace(
@@ -10,8 +11,8 @@ args = argparse.Namespace(
     temperature=0.1, 
     task='swe', 
     naive_run=False, 
-    prompt_sample=None, 
-    method_generate='propose', 
+    prompt_sample='cot', 
+    method_generate='sample', 
     method_evaluate='vote', 
     method_select='greedy', 
     n_generate_sample=1, 
