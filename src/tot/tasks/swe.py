@@ -1,7 +1,7 @@
-import re
+import re, os
 from tot.tasks.base import Task
 from tot.prompts.swe import *
-from tot.models import gpt
+from tot.models import gpt, groq
 
 class SWETask(Task):
     """
@@ -24,7 +24,11 @@ class SWETask(Task):
     def test_output(self, idx: int, output: str):
         output = output.split('Patch:\n')[-1]
         prompt = score_prompt + output
-        score_outputs = gpt(prompt, n=5, model='gpt-4')
+        api_base = os.getenv("OPENAI_API_BASE", "")
+        if api_base == 'https://api.groq.com/openai/v1':
+            score_output = groq(prompt, n=3, model='mixtral-8x7b-32768')
+        else:
+            score_outputs = gpt(prompt, n=5, model='gpt-4')
         scores = []
         for score_output in score_outputs:
             print("score_output: ",score_output)
@@ -89,3 +93,34 @@ class SWETask(Task):
         else:
             print(f'-----------------compare no match: {[compare_output]}')
             return -1
+    
+    @staticmethod
+    def parse_diff_block(text: str):
+        """Extracts the first block of unified diff format.
+
+        Args:
+            text (str): The large text containing one or more diff blocks.
+
+        Returns:
+            str: The first block between `diff and ` if found, otherwise None.
+        """
+
+        start_pattern = r"```diff"
+        end_pattern = r"```"
+
+        in_diff_block = False
+        diff_block = []
+
+        for line in text.splitlines():
+            if start_pattern in line:  
+                in_diff_block = True
+                continue  # Skip the line with the start marker
+
+            if in_diff_block:
+                if end_pattern in line:
+                    in_diff_block = False
+                    break  # End of the diff block
+                else:
+                    diff_block.append(line)
+
+        return "\n".join(diff_block) if diff_block else None
