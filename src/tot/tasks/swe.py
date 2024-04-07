@@ -19,14 +19,20 @@ class SWETask(Task):
         return len(self.data)
     
     def get_input(self, idx: int) -> str:
-        return self.data[idx]["problem_statement"]
+        swe_prompt = '''
+Repository url: https://github.com/{repo}
+Base commit: {base_commit}
+Problem statement: 
+{problem_statement}
+'''
+        return swe_prompt.format(repo=self.data[idx]['repo'], base_commit=self.data[idx]['base_commit'], problem_statement=self.data[idx]['problem_statement'])
     
     def test_output(self, idx: int, output: str):
         output = output.split('Patch:\n')[-1]
         prompt = score_prompt + output
         api_base = os.getenv("OPENAI_API_BASE", "")
         if api_base == 'https://api.groq.com/openai/v1':
-            score_output = groq(prompt, n=3, model='mixtral-8x7b-32768')
+            score_output = groq(prompt, n=5, model='mixtral-8x7b-32768')
         else:
             score_outputs = gpt(prompt, n=5, model='gpt-4')
         scores = []

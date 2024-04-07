@@ -2,7 +2,13 @@ standard_prompt = '''
 {input}
 '''
 
-cot_prompt = '''I need you to solve this issue by generating a single patch file that I can apply directly to this repository using git apply. 
+cot_prompt = '''Given the Repository url, Base commit and Problem statement of a github issue. Please write a correct git patch to solve it.
+The output must have this format:
+Patch:
+```diff
+Your patch here.
+```
+
 The patch file should be in the unified diff format. Example:
 
 ```diff
@@ -19,14 +25,6 @@ diff --git a/file.py b/file.py
 +    return euclidean(b, a % b)
 ```
 
-Given the problem statement of a github issue write a correct git patch to solve it.
-
-Patch:
-```diff
-Your patch here.
-```
-
-The problem statement is the following: 
 {input}
 '''
 
