@@ -52,14 +52,13 @@ def groq(prompt, model="mixtral-8x7b-32768", temperature=0.5, max_tokens=1500, n
     messages = [{"role": "user", "content": prompt}]
     return groqgpt(messages, model=model, temperature=temperature, max_tokens=max_tokens, n=n, stop=stop)
 
-def groqgpt(messages, model="mixtral-8x7b-32768", temperature=0.5, max_tokens=1500,n=1, stop=None) -> list:
+def groqgpt(messages, model="mixtral-8x7b-32768", temperature=0.5, max_tokens=2000,n=1, stop=None) -> list:
     global completion_tokens, prompt_tokens
     outputs = []
     while n > 0:
-        cnt = min(n, 20)
-        n -= cnt
+        n -= 1
         res = completions(model=model, messages=messages, temperature=temperature, max_tokens=max_tokens, stop=stop)
-        outputs.extend([choice["message"]["content"] for choice in res["choices"]])
+        outputs.append(res["choices"][0]["message"]["content"])
         # log completion tokens
         completion_tokens += res["usage"]["completion_tokens"]
         prompt_tokens += res["usage"]["prompt_tokens"]

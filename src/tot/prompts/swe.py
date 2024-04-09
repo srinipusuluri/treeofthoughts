@@ -3,7 +3,12 @@ standard_prompt = '''
 '''
 
 cot_prompt = '''Given the Repository url, Base commit and Problem statement of a github issue. Please write a correct git patch to solve it.
-The output must have this format:
+Reply with a plan first, then once plan is provided, reply with a patch.
+Your output must be of the following format:
+
+Plan:
+Your plan here.
+
 Patch:
 ```diff
 Your patch here.

@@ -4,11 +4,13 @@ from functools import partial
 
 api_base = os.getenv("OPENAI_API_BASE", "")
 if api_base == 'https://api.groq.com/openai/v1':
-    from tot.models import groq
-    platform = groq 
+    from tot.models import groq,groq_usage
+    platform = groq
+    usage = groq_usage
 else:
-    from tot.models import gpt
+    from tot.models import gpt,gpt_usage
     platform = gpt
+    usage = gpt_usage
 
 
 def get_value(task, x, y, n_evaluate_sample, cache_value=True):
@@ -90,6 +92,8 @@ def solve(args, task, idx, to_print=True):
         
         infos.append({'step': step, 'x': x, 'ys': ys, 'new_ys': new_ys, 'values': values, 'select_new_ys': select_new_ys})
         ys = select_new_ys
+        
+    print(usage())
     
     if to_print: 
         print(ys)

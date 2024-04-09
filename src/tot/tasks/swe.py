@@ -3,6 +3,13 @@ from tot.tasks.base import Task
 from tot.prompts.swe import *
 from tot.models import gpt, groq
 
+instance_info = '''
+Repository url: https://github.com/{repo}
+Base commit: {base_commit}
+Problem statement: 
+{problem_statement}
+'''
+
 class SWETask(Task):
     """
     Input (x)   : a problem statement
@@ -19,13 +26,7 @@ class SWETask(Task):
         return len(self.data)
     
     def get_input(self, idx: int) -> str:
-        swe_prompt = '''
-Repository url: https://github.com/{repo}
-Base commit: {base_commit}
-Problem statement: 
-{problem_statement}
-'''
-        return swe_prompt.format(repo=self.data[idx]['repo'], base_commit=self.data[idx]['base_commit'], problem_statement=self.data[idx]['problem_statement'])
+        return instance_info.format(repo=self.data[idx]['repo'], base_commit=self.data[idx]['base_commit'], problem_statement=self.data[idx]['problem_statement'])
     
     def test_output(self, idx: int, output: str):
         output = output.split('Patch:\n')[-1]
@@ -130,3 +131,28 @@ Problem statement:
                     diff_block.append(line)
 
         return "\n".join(diff_block) if diff_block else None
+
+    def parse_patch_block(text):
+        """
+        Extracts the content inside the <patch> and </patch> tags from the given text.
+        
+        Args:
+            text (str): The large text to search for the patch content.
+        
+        Returns:
+            str: The content inside the <patch> and </patch> tags, or an empty string if not found.
+        """
+        start_tag = "<patch>"
+        end_tag = "</patch>"
+        
+        start_index = text.find(start_tag)
+        if start_index == -1:
+            return ""
+        
+        start_index += len(start_tag)
+        end_index = text.find(end_tag, start_index)
+        if end_index == -1:
+            return ""
+        
+        patch_content = text[start_index:end_index]
+        return patch_content
