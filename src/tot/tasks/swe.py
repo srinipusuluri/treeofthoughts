@@ -20,13 +20,14 @@ class SWETask(Task):
         super().__init__()
         self.data = dataset
         self.steps = 2
-        self.stops = ['\nPatch:\n', None]
+        self.stops = ['\nPatch:\n', '<|eot_id|>']
 
     def __len__(self) -> int:
         return len(self.data)
     
     def get_input(self, idx: int) -> str:
         return instance_info.format(repo=self.data[idx]['repo'], base_commit=self.data[idx]['base_commit'], problem_statement=self.data[idx]['problem_statement'])
+        # return instance_info.format(repo=self.data[idx]['repo'], base_commit=self.data[idx]['base_commit'], problem_statement=self.data[idx]['text'])
     
     def test_output(self, idx: int, output: str):
         output = output.split('Patch:\n')[-1]
@@ -35,7 +36,7 @@ class SWETask(Task):
         if api_base == 'https://api.groq.com/openai/v1':
             score_output = groq(prompt, n=5, model='mixtral-8x7b-32768')
         else:
-            score_outputs = gpt(prompt, n=5, model='gpt-4')
+            score_outputs = gpt(prompt, n=5, model='gpt-4-turbo')
         scores = []
         for score_output in score_outputs:
             print("score_output: ",score_output)

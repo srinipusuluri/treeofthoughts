@@ -7,7 +7,7 @@ import time
 
 print("Downloading dataset...")
 dataset = load_dataset("princeton-nlp/SWE-bench_Lite", split = "test", cache_dir='datasets_cache')
-preds_path = "llama2-70b-4096.jsonl"
+preds_path = "llama3-70b-8192.jsonl"
 try:
     with open(preds_path, "r") as file:
         preds_jsonl = file.read()
@@ -34,8 +34,8 @@ def save_jsonl(jsonl_object, file_path="preds.jsonl"):
 
 args = argparse.Namespace(
     # backend='mixtral-8x7b-32768',
-    backend='llama2-70b-4096',
-    temperature=0.5, 
+    backend='llama3-70b-8192',
+    temperature=0.7, 
     task='swe', 
     naive_run=False,
     prompt_sample='cot', 
@@ -50,12 +50,16 @@ print("Solving...")
 task = SWETask(dataset)
 
 
-for index in range(6,100):
-    ys, infos = solve(args, task, index, to_print=False)
+for index in range(3,4):
+    instance_id = dataset[index]["instance_id"]
+    size = len(dataset[index]["problem_statement"])
+    print(f" ### Task {index} -- {instance_id} -> size ({size} )###")
+    ys, infos, _ = solve(args, task, index, to_print=False)
     preds_jsonl = update_jsonl(dataset[index]["instance_id"], SWETask.parse_diff_block(ys[0]), args.backend, preds_jsonl)
     save_jsonl(preds_jsonl, preds_path)
-    # print("-----------Predicted----------------------")
-    # print(SWETask.parse_diff_block(ys[0]))
-    # # print("-----------Expected----------------------")
-    # # print(dataset[index]["patch"])
-    time.sleep(60)
+    print("-----------Predicted----------------------")
+    print(SWETask.parse_diff_block(ys[0]))
+    print("-----------Expected----------------------")
+    print(dataset[index]["patch"])
+    # time.sleep(1)
+
